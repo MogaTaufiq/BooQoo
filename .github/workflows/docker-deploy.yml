@@ -1,0 +1,260 @@
+name: Docker CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+# Fix Node.js 20 deprecation warning
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  # ==================== Job 1: Lint, Type Check & Security ====================
+  quality-checks:
+    name: Quality & Security Checks
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run ESLint
+        run: npm run lint
+        continue-on-error: false
+
+      - name: Run TypeScript type check
+        run: npm run type-check
+        continue-on-error: false
+
+      - name: Run security audit (critical only)
+        run: npm audit --audit-level=critical
+        continue-on-error: true
+
+      - name: Generate security report
+        run: |
+          npm audit --audit-level=critical --json > audit-report.json || true
+          echo "✅ Security audit completed"
+
+      - name: Upload security report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: security-audit-report
+          path: audit-report.json
+          retention-days: 30
+
+  # ==================== Job 2: Database Migration Check ====================
+  migration-check:
+    name: Database Migration Check
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: booqoo_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate Prisma Client
+        run: npx prisma generate
+
+      - name: Run database migrations
+        run: npx prisma db push
+        env:
+          DATABASE_URL: postgresql://test:test@localhost:5432/booqoo_test
+
+      - name: Validate Prisma schema
+        run: npx prisma validate
+        env:
+          DATABASE_URL: postgresql://test:test@localhost:5432/booqoo_test
+
+      - name: Check migration status
+        run: |
+          echo "✅ Database migrations validated successfully"
+
+  # ==================== Job 3: Build & Push Docker Image ====================
+  build-docker:
+    name: Build & Push Docker Image
+    runs-on: ubuntu-latest
+    needs: [quality-checks, migration-check]
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+        # Alternative untuk GitHub Container Registry (GHCR):
+        # - name: Log in to GitHub Container Registry
+        #   uses: docker/login-action@v3
+        #   with:
+        #     registry: ghcr.io
+        #     username: ${{ github.actor }}
+        #     password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata (tags, labels)
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            ${{ secrets.DOCKER_USERNAME }}/booqoo-pos
+          # Alternative untuk GHCR:
+          # images: ghcr.io/${{ github.repository }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=sha,prefix={{branch}}-
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile.production
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/booqoo-pos:buildcache
+          cache-to: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/booqoo-pos:buildcache,mode=max
+          build-args: |
+            BUILDTIME=${{ github.event.head_commit.timestamp }}
+            VERSION=${{ github.sha }}
+
+      - name: Image digest
+        run: echo "Image digest - ${{ steps.meta.outputs.digest }}"
+
+  # ==================== Job 4: Deploy to Production ====================
+  deploy-production:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    needs: [build-docker]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    environment:
+      name: production
+      url: https://booqoo.yourdomain.com
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to production server via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.PRODUCTION_HOST }}
+          username: ${{ secrets.PRODUCTION_USER }}
+          key: ${{ secrets.PRODUCTION_SSH_KEY }}
+          port: ${{ secrets.PRODUCTION_PORT || 22 }}
+          script: |
+            # Navigate to app directory
+            cd /opt/booqoo || exit 1
+
+            # Pull latest image
+            echo "🔄 Pulling latest Docker image..."
+            docker pull ${{ secrets.DOCKER_USERNAME }}/booqoo-pos:latest
+
+            # Stop and remove old container
+            echo "🛑 Stopping old container..."
+            docker-compose -f docker-compose.prod.yml down
+
+            # Start new container
+            echo "🚀 Starting new container..."
+            docker-compose -f docker-compose.prod.yml up -d
+
+            # Run database migrations
+            echo "📦 Running database migrations..."
+            docker-compose -f docker-compose.prod.yml exec -T app npx prisma migrate deploy
+
+            # Health check
+            echo "🏥 Running health check..."
+            sleep 10
+            curl -f http://localhost:3000/api/health || exit 1
+
+            # Clean up old images
+            echo "🧹 Cleaning up old Docker images..."
+            docker image prune -af --filter "until=24h"
+
+            echo "✅ Deployment completed successfully!"
+
+      - name: Notify deployment success
+        run: |
+          echo "✅ Production deployment successful!"
+          echo "🚀 Application is live at: https://booqoo.yourdomain.com"
+          echo "📦 Image: ${{ secrets.DOCKER_USERNAME }}/booqoo-pos:latest"
+
+  # ==================== Job 5: Deploy to Staging (Optional) ====================
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    needs: [build-docker]
+    if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
+    environment:
+      name: staging
+      url: https://staging.booqoo.yourdomain.com
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to staging server via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.STAGING_HOST }}
+          username: ${{ secrets.STAGING_USER }}
+          key: ${{ secrets.STAGING_SSH_KEY }}
+          port: ${{ secrets.STAGING_PORT || 22 }}
+          script: |
+            cd /opt/booqoo-staging || exit 1
+            docker pull ${{ secrets.DOCKER_USERNAME }}/booqoo-pos:develop
+            docker-compose -f docker-compose.staging.yml down
+            docker-compose -f docker-compose.staging.yml up -d
+            docker-compose -f docker-compose.staging.yml exec -T app npx prisma migrate deploy
+            sleep 10
+            curl -f http://localhost:3001/api/health || exit 1
+            docker image prune -af --filter "until=24h"
+            echo "✅ Staging deployment completed!"
+
+      - name: Notify staging deployment
+        run: |
+          echo "✅ Staging deployment successful!"
+          echo "🧪 Test at: https://staging.booqoo.yourdomain.com"

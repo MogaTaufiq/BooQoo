@@ -1,0 +1,97 @@
+# ============================================
+# .dockerignore for Production Build
+# Optimized to reduce build context size
+# ============================================
+
+# Dependencies (will be installed in container)
+node_modules
+npm-debug.log
+yarn-error.log
+yarn.lock
+pnpm-lock.yaml
+
+# Next.js build outputs (will be built in container)
+.next
+out
+build
+dist
+
+# Environment files (use secrets/env vars instead)
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+.env*.local
+
+# Git files
+.git
+.gitignore
+.gitattributes
+
+# CI/CD files
+.github
+.gitlab-ci.yml
+.circleci
+
+# IDE and editor files
+.vscode
+.idea
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Testing files
+coverage
+.nyc_output
+__tests__
+*.test.ts
+*.test.tsx
+*.spec.ts
+*.spec.tsx
+jest.config.js
+vitest.config.ts
+
+# Documentation
+*.md
+!README.md
+docs
+Documentation
+
+# Docker files (avoid recursion)
+Dockerfile
+Dockerfile.*
+.dockerignore
+docker-compose*.yml
+
+# Logs
+logs
+*.log
+
+# Temporary files
+tmp
+temp
+.tmp
+
+# Claude and AI files
+.claude
+
+# Mac files
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Linux files
+*~
+.directory
+
+# Build artifacts from local development
+.vercel
+.turbo
+.cache
