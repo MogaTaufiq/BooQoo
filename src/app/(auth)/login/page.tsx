@@ -1,10 +1,11 @@
 'use client';
 
+import { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { LoginForm } from '@/components/auth/LoginForm';
 import { Alert } from '@/components/ui';
 
-export default function LoginPage() {
+function LoginError() {
   const searchParams = useSearchParams();
   const error = searchParams?.get('error');
 
@@ -25,6 +26,12 @@ export default function LoginPage() {
 
   const errorMessage = getErrorMessage(error);
 
+  return errorMessage ? (
+    <Alert type="error" message={errorMessage} />
+  ) : null;
+}
+
+export default function LoginPage() {
   return (
     <div className="bg-white rounded-2xl shadow-xl p-8">
       <div className="text-center mb-8">
@@ -32,11 +39,9 @@ export default function LoginPage() {
         <p className="text-gray-600">Masuk ke akun Anda</p>
       </div>
 
-      {errorMessage && (
-        <div className="mb-4">
-          <Alert type="error" message={errorMessage} />
-        </div>
-      )}
+      <Suspense fallback={null}>
+        <LoginError />
+      </Suspense>
 
       <LoginForm />
     </div>

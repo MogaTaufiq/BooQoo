@@ -4,7 +4,7 @@
 // Stock In (Restock) Page
 // ============================================
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Button, Input, Alert } from '@/components/ui';
 
@@ -16,7 +16,7 @@ interface Product {
   variants?: Array<{ id: string; name: string }>;
 }
 
-export default function StockInPage() {
+function StockInForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const preselectedProductId = searchParams?.get('productId');
@@ -229,5 +229,13 @@ export default function StockInPage() {
         </div>
       </form>
     </div>
+  );
+}
+
+export default function StockInPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <StockInForm />
+    </Suspense>
   );
 }

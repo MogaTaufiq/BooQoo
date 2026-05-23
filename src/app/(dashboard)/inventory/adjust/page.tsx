@@ -4,7 +4,7 @@
 // Stock Adjustment Page
 // ============================================
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Button, Input, Alert } from '@/components/ui';
 
@@ -26,7 +26,7 @@ const adjustmentReasons = [
   { value: 'OTHER', label: 'Lainnya' },
 ];
 
-export default function StockAdjustmentPage() {
+function StockAdjustmentForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const preselectedProductId = searchParams?.get('productId');
@@ -278,5 +278,13 @@ export default function StockAdjustmentPage() {
         </div>
       </form>
     </div>
+  );
+}
+
+export default function StockAdjustmentPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <StockAdjustmentForm />
+    </Suspense>
   );
 }
