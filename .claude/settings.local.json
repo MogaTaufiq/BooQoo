@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mkdir -p ~/Projects/frozenHub)",
+      "Read(//Users/mogataufiq/Projects/frozenHub/**)",
+      "Bash(npm install *)",
+      "Bash(npm run *)",
+      "Bash(docker-compose *)"
+    ]
+  },
+  "enabledPlugins": {
+    "ruflo-adr@ruflo": true,
+    "ruflo-workflows@ruflo": true,
+    "ruflo-core@ruflo": true,
+    "ruflo-swarm@ruflo": true,
+    "ruflo-rag-memory@ruflo": true,
+    "ruflo-neural-trader@ruflo": true
+  }
+}
