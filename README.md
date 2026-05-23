@@ -1,247 +1,151 @@
-# BooQoo - POS & Stock Management System
+# 🛒 BooQoo - POS & Inventory Management System
 
-Aplikasi Point of Sale (POS) dan Manajemen Stok untuk UMKM rumahan Indonesia, dengan fokus pada bisnis frozen food.
+Aplikasi POS (Point of Sale) dan manajemen inventori modern untuk UMKM rumahan. Dibangun dengan Next.js 14, TypeScript, dan PostgreSQL.
 
-## 🚀 Features
+![Status](https://img.shields.io/badge/status-production--ready-green)
+![Version](https://img.shields.io/badge/version-1.0.0-blue)
+![TypeScript](https://img.shields.io/badge/typescript-100%25-blue)
 
-- **Offline-First Architecture**: Tetap bisa transaksi meski internet mati
-- **Mobile-Responsive**: Dioptimalkan untuk penggunaan di HP
-- **Multi-Tenant**: Setiap pengguna punya toko sendiri
-- **Real-time Stock Management**: Stok otomatis berkurang saat checkout
-- **Batch & Expiry Tracking**: Pantau tanggal kedaluwarsa produk
-- **Laporan Sederhana**: Dashboard harian dengan metrik penting
+## ✨ Features
 
-## 🛠️ Tech Stack
+### 🔐 Authentication & Security
+- JWT-based authentication with NextAuth v4
+- Multi-tenant architecture (storeId isolation)
+- Protected routes with middleware
+- Role-based access control
 
-- **Frontend**: Next.js 14, React 18, TypeScript, Tailwind CSS
-- **Backend**: Next.js API Routes, Node.js
-- **Database**: PostgreSQL with Prisma ORM
-- **State Management**: Zustand + React Query
-- **Offline Storage**: IndexedDB
-- **Authentication**: NextAuth.js
-- **Containerization**: Docker & Docker Compose
+### 📦 Product Management
+- CRUD operations for products
+- Product variants support
+- SKU auto-generation
+- Category management
+- Soft delete (isActive flag)
+- Search and pagination
+
+### 📊 Inventory Management
+- Real-time stock tracking
+- Stock in (restock) functionality
+- Stock adjustment with reasons
+- Low stock alerts (configurable threshold)
+- Expiry date tracking with warnings
+- Batch code management
+- FIFO stock movement audit trail
+
+### 💰 POS / Checkout
+- Complete checkout workflow
+- Shopping cart management
+- Real-time stock validation
+- FIFO automatic stock deduction
+- Multiple payment methods (Cash, Transfer, E-Wallet)
+- Change calculation
+- Receipt generation with print support
+- Transaction history
+
+### 📈 Reports & Analytics
+- Sales report with date range filtering
+- Group by day/week/month
+- Payment method breakdown
+- Top 10 best-selling products
+- Inventory valuation report
+- Low stock and expiry reports
+
+### ⚙️ Settings
+- Store information management
+- Configurable low stock threshold
+- Configurable expiry alert days
+- System preferences
+
+## 🚀 Tech Stack
+
+- **Framework:** Next.js 14 (App Router)
+- **Language:** TypeScript
+- **Database:** PostgreSQL + Prisma ORM
+- **Authentication:** NextAuth v4
+- **State Management:** Zustand
+- **Styling:** Tailwind CSS
+- **Form Validation:** React Hook Form + Zod
+- **Deployment:** Docker-ready
 
 ## 📋 Prerequisites
 
-- Node.js >= 18.0.0
-- npm >= 9.0.0
-- Docker & Docker Compose (optional)
-- PostgreSQL 14+ (if not using Docker)
+- Node.js 18+ 
+- Docker & Docker Compose (for PostgreSQL)
+- npm or yarn
 
-## 🚀 Quick Start
+## 🔧 Installation
 
-### Option 1: With Docker (Recommended)
+### 1. Clone Repository
+\`\`\`bash
+git clone https://github.com/mogataufiq/BooQoo.git
+cd BooQoo
+\`\`\`
 
-1. **Clone the repository**
-   ```bash
-   git clone <repository-url>
-   cd BooQoo
-   ```
+### 2. Install Dependencies
+\`\`\`bash
+npm install
+\`\`\`
 
-2. **Start services**
-   ```bash
-   # Development mode
-   docker-compose -f docker-compose.dev.yml up
+### 3. Setup Environment Variables
+\`\`\`bash
+cp .env.example .env
+\`\`\`
 
-   # Or production mode
-   docker-compose up
-   ```
+### 4. Start PostgreSQL (Docker)
+\`\`\`bash
+docker-compose -f docker-compose.dev.yml up -d
+\`\`\`
 
-3. **Access the application**
-   - App: http://localhost:3000
-   - Database: localhost:5432
-   - pgAdmin (if tools profile enabled): http://localhost:5050
+### 5. Run Database Migrations
+\`\`\`bash
+npx prisma db push
+npx prisma generate
+\`\`\`
 
-### Option 2: Local Development
+### 6. Start Development Server
+\`\`\`bash
+npm run dev
+\`\`\`
 
-1. **Install dependencies**
-   ```bash
-   npm install
-   ```
+Open [http://localhost:3000](http://localhost:3000)
 
-2. **Set up environment variables**
-   ```bash
-   cp .env.example .env
-   # Edit .env with your database credentials
-   ```
+## 🎯 Usage Guide
 
-3. **Set up database**
-   ```bash
-   # Start PostgreSQL (make sure it's running)
-   # Then run migrations
-   npx prisma migrate dev
-   npx prisma generate
-   ```
+### First Time Setup
 
-4. **Start development server**
-   ```bash
-   npm run dev
-   ```
+1. **Register Account** → `/register`
+2. **Add Products** → `/products/new`
+3. **Stock In** → `/inventory/stock-in`
+4. **Start Selling** → `/checkout`
 
-5. **Open browser**
-   ```
-   http://localhost:3000
-   ```
+### Daily Operations
 
-## 📁 Project Structure
+- **Restock:** `/inventory/stock-in`
+- **Check Stock:** `/inventory`
+- **Sell:** `/checkout`
+- **View Sales:** `/reports`
+- **Settings:** `/settings`
 
-```
-BooQoo/
-├── prisma/
-│   ├── schema.prisma          # Database schema
-│   ├── migrations/            # Database migrations
-│   └── seed/                  # Seed data
-├── public/                    # Static files
-├── src/
-│   ├── app/                   # Next.js 14 App Router
-│   │   ├── (auth)/           # Authentication pages
-│   │   ├── (dashboard)/      # Dashboard pages
-│   │   └── api/              # API routes
-│   ├── components/           # React components
-│   │   ├── ui/              # Base UI components
-│   │   ├── layout/          # Layout components
-│   │   ├── auth/            # Auth components
-│   │   ├── checkout/        # POS components
-│   │   ├── products/        # Product management
-│   │   └── inventory/       # Inventory components
-│   ├── lib/                  # Core libraries
-│   │   ├── db/              # Database client
-│   │   ├── auth/            # Auth utilities
-│   │   ├── api/             # API client
-│   │   ├── sync/            # Offline sync engine
-│   │   ├── storage/         # IndexedDB wrapper
-│   │   └── validators/      # Zod schemas
-│   ├── hooks/               # Custom React hooks
-│   ├── types/               # TypeScript types
-│   ├── utils/               # Utility functions
-│   ├── store/               # Zustand stores
-│   └── constants/           # App constants
-├── tests/                   # Test files
-├── Dockerfile               # Production Docker image
-├── Dockerfile.dev           # Development Docker image
-├── docker-compose.yml       # Production compose
-└── docker-compose.dev.yml   # Development compose
-```
+## 📊 API Endpoints
 
-## 🔧 Available Scripts
+- **Auth:** `/api/auth/*`
+- **Products:** `/api/products`
+- **Inventory:** `/api/inventory/*`
+- **Checkout:** `/api/checkout`
+- **Transactions:** `/api/transactions`
+- **Reports:** `/api/reports/*`
+- **Settings:** `/api/settings`
 
-```bash
-# Development
-npm run dev              # Start dev server
-npm run build            # Build for production
-npm run start            # Start production server
-npm run lint             # Run ESLint
-npm run format           # Format code with Prettier
+## 🚢 Deployment
 
-# Testing
-npm run test             # Run tests
-npm run test:coverage    # Run tests with coverage
-npm run test:ui          # Run tests with UI
+\`\`\`bash
+docker-compose up -d
+\`\`\`
 
-# Database
-npm run db:migrate       # Run migrations
-npm run db:generate      # Generate Prisma client
-npm run db:push          # Push schema without migration
-npm run db:studio        # Open Prisma Studio
-npm run db:seed          # Seed database
+## 👨‍💻 Author
 
-# Type checking
-npm run type-check       # TypeScript type checking
-```
-
-## 🐳 Docker Commands
-
-```bash
-# Development
-docker-compose -f docker-compose.dev.yml up          # Start dev services
-docker-compose -f docker-compose.dev.yml down        # Stop dev services
-
-# Production
-docker-compose up                                     # Start prod services
-docker-compose down                                   # Stop prod services
-docker-compose up --build                            # Rebuild and start
-
-# With pgAdmin
-docker-compose -f docker-compose.dev.yml --profile tools up
-
-# View logs
-docker-compose logs -f app                           # App logs
-docker-compose logs -f postgres                      # Database logs
-```
-
-## 🗄️ Database Setup
-
-The project uses PostgreSQL with Prisma ORM. Migrations are automatically run when using Docker.
-
-For manual setup:
-
-```bash
-# Create database
-createdb booqoo
-
-# Run migrations
-npx prisma migrate dev
-
-# Seed data (optional)
-npm run db:seed
-```
-
-## 📱 PWA Setup
-
-The app is designed as a Progressive Web App (PWA) for mobile installation:
-
-1. Open app in mobile browser
-2. Click "Add to Home Screen"
-3. Use like a native app with offline support
-
-## 🔐 Security
-
-- HTTPS/TLS encryption
-- CSRF protection
-- XSS prevention
-- SQL injection protection via Prisma
-- Rate limiting (coming in Phase 2)
-- Secure headers configured
-
-## 📊 Development Roadmap
-
-### Phase 1: MVP (Current)
-- ✅ Project setup & architecture
-- ⏳ Authentication & user management
-- ⏳ Product CRUD
-- ⏳ POS checkout
-- ⏳ Offline-first sync
-- ⏳ Basic reports
-
-### Phase 2: Enhancement
-- Multi-user with roles
-- Batch & expiry tracking (required)
-- Stock reconciliation
-- WhatsApp integration
-
-### Phase 3: Expansion
-- Native mobile app
-- Advanced analytics
-- Loyalty program
-- Supplier management
-
-## 🤝 Contributing
-
-This is a private project. For the development team:
-
-1. Create a feature branch
-2. Make changes
-3. Write tests
-4. Submit PR for review
-
-## 📝 License
-
-Private - All rights reserved
-
-## 📧 Support
-
-For issues or questions, contact the development team.
+**Moga Taufiq**
+- GitHub: [@mogataufiq](https://github.com/mogataufiq)
 
 ---
 
-**Built with ❤️ for Indonesian UMKM**
+**Made with ❤️ for Indonesian SMEs**

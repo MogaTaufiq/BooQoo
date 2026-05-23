@@ -1,0 +1,51 @@
+{
+  "name": "BooQoo - POS & Inventory",
+  "short_name": "BooQoo",
+  "description": "Aplikasi POS dan manajemen inventori untuk UMKM",
+  "start_url": "/dashboard",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#2563eb",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["business", "productivity"],
+  "shortcuts": [
+    {
+      "name": "Kasir",
+      "short_name": "POS",
+      "description": "Buka halaman kasir",
+      "url": "/checkout",
+      "icons": [
+        {
+          "src": "/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Inventori",
+      "short_name": "Stok",
+      "description": "Kelola stok barang",
+      "url": "/inventory",
+      "icons": [
+        {
+          "src": "/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ]
+}
