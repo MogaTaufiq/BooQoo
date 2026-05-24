@@ -10,14 +10,33 @@ import { Button, Card, Alert } from '@/components/ui';
 
 interface TransactionDetail {
   id: string;
+  transactionDate: string;
   totalAmount: number;
   paymentMethod: string;
-  amountPaid: number;
-  changeAmount: number;
+  amountReceived?: number;
+  changeAmount?: number;
   customerName?: string;
   notes?: string;
-  status: string;
-  createdAt: Date;
+  createdByUser: {
+    name: string;
+    email: string;
+  };
+  items: Array<{
+    id: string;
+    productName: string;
+    variantName?: string;
+    quantity: number;
+    priceUnit: number;
+    subtotal: number;
+    product: {
+      name: string;
+      sku: string;
+      unit: string;
+    };
+    variant?: {
+      name: string;
+    };
+  }>;
   details: Array<{
     productName: string;
     quantity: number;
