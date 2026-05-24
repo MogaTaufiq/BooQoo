@@ -1,0 +1,232 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+  release:
+    types: [published]
+
+# Force Node.js 24 to avoid deprecation warnings
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  # ==================== STAGE 1: TEST ====================
+  unit-test:
+    name: Unit Tests & Quality Checks
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 18
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run ESLint
+        run: npm run lint
+
+      - name: Run TypeScript check
+        run: npm run type-check
+
+      - name: Run security audit
+        run: npm audit --audit-level=critical
+        continue-on-error: true
+
+  # ==================== STAGE 2: BUILD ====================
+  build:
+    name: Build Docker Image
+    runs-on: ubuntu-latest
+    needs: unit-test
+    if: github.event_name == 'push' || github.event_name == 'release'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image (test)
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          push: false
+          tags: booqoo:test
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # ==================== STAGE 3: PUSH ====================
+  push:
+    name: Push to Docker Registry
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/main' || github.event_name == 'release'
+    outputs:
+      image_tag: ${{ steps.meta.outputs.tags }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ secrets.DOCKER_USERNAME }}/booqoo
+          tags: |
+            type=ref,event=branch
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=sha,prefix={{branch}}-
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
+            type=raw,value=beta,enable=${{ github.ref == 'refs/heads/develop' }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # ==================== STAGE 4: DEPLOY BETA (Vercel) ====================
+  deploy-beta:
+    name: Deploy to Vercel (Beta)
+    runs-on: ubuntu-latest
+    needs: push
+    if: github.ref == 'refs/heads/develop'
+    environment:
+      name: beta
+      url: https://booqoo-beta.vercel.app
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to Vercel
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          vercel-args: '--prod'
+          working-directory: ./
+
+  # ==================== STAGE 5: RELEASE ====================
+  release:
+    name: Create Release Tag
+    runs-on: ubuntu-latest
+    needs: push
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get version from package.json
+        id: version
+        run: echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
+
+      - name: Create Git Tag
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git tag -a "v${{ steps.version.outputs.version }}" -m "Release v${{ steps.version.outputs.version }}"
+          git push origin "v${{ steps.version.outputs.version }}"
+        continue-on-error: true
+
+  # ==================== STAGE 6: RETAG IMAGE ====================
+  retag-image:
+    name: Retag as Production
+    runs-on: ubuntu-latest
+    needs: [push, release]
+    if: github.event_name == 'release'
+
+    steps:
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Pull and retag image
+        run: |
+          docker pull ${{ secrets.DOCKER_USERNAME }}/booqoo:latest
+          docker tag ${{ secrets.DOCKER_USERNAME }}/booqoo:latest ${{ secrets.DOCKER_USERNAME }}/booqoo:production
+          docker push ${{ secrets.DOCKER_USERNAME }}/booqoo:production
+
+  # ==================== STAGE 7: DEPLOY PRODUCTION ====================
+  deploy-prod:
+    name: Deploy to Production (AWS/DO)
+    runs-on: ubuntu-latest
+    needs: retag-image
+    if: github.event_name == 'release'
+    environment:
+      name: production
+      url: https://booqoo.yourdomain.com
+
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.PRODUCTION_HOST }}
+          username: ${{ secrets.PRODUCTION_USER }}
+          key: ${{ secrets.PRODUCTION_SSH_KEY }}
+          script: |
+            cd /opt/booqoo
+            docker compose pull app
+            docker compose up -d
+            docker compose exec -T app npx prisma migrate deploy
+            sleep 10
+            curl -f http://localhost:3000/api/health || exit 1
+            docker image prune -af --filter "until=24h"
+            echo "✅ Production deployment completed!"
+
+  # ==================== STAGE 8: ROLLBACK (Manual Trigger) ====================
+  rollback:
+    name: Rollback to Previous Version
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch'
+    environment:
+      name: production
+
+    steps:
+      - name: Rollback via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.PRODUCTION_HOST }}
+          username: ${{ secrets.PRODUCTION_USER }}
+          key: ${{ secrets.PRODUCTION_SSH_KEY }}
+          script: |
+            cd /opt/booqoo
+            # List available tags
+            docker images ${{ secrets.DOCKER_USERNAME }}/booqoo
+
+            # Prompt for rollback version
+            echo "Rolling back to previous stable version..."
+            # Manual: docker compose down && docker compose up -d
+            echo "⚠️ Manual rollback required - check previous image tags"

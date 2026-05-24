@@ -7,35 +7,44 @@ yarn-error.log
 .next
 out
 build
+dist
 
-# Environment
+# Environment files (use env vars from compose)
 .env
-.env.local
-.env*.local
+.env*
 
 # Git
 .git
 .gitignore
 
+# CI/CD
+.github
+.gitlab-ci.yml
+
 # IDE
 .vscode
 .idea
 *.swp
-*.swo
 
 # Testing
 coverage
-.nyc_output
-
-# Misc
-.DS_Store
-*.pem
+__tests__
+*.test.ts
+*.test.tsx
 
 # Documentation
 *.md
 !README.md
 
 # Docker
-Dockerfile
-.dockerignore
-docker-compose*.yml
+Dockerfile*
+.dockerignore*
+docker-compose*
+
+# Misc
+.DS_Store
+.archive
+logs
+*.log
+tmp
+temp
