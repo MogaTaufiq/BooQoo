@@ -138,7 +138,7 @@ export default function TransactionDetailPage() {
           <div className="flex justify-between">
             <span className="text-gray-600">Tanggal:</span>
             <span className="font-medium">
-              {new Date(transaction.createdAt).toLocaleString('id-ID', {
+              {new Date(transaction.transactionDate).toLocaleString('id-ID', {
                 dateStyle: 'medium',
                 timeStyle: 'short',
               })}
@@ -146,7 +146,7 @@ export default function TransactionDetailPage() {
           </div>
           <div className="flex justify-between">
             <span className="text-gray-600">Kasir:</span>
-            <span className="font-medium">{transaction.user.name}</span>
+            <span className="font-medium">{transaction.createdByUser.name}</span>
           </div>
           {transaction.customerName && (
             <div className="flex justify-between">
@@ -164,7 +164,7 @@ export default function TransactionDetailPage() {
         <div className="mb-6 pb-6 border-b">
           <h3 className="font-semibold text-gray-900 mb-4">Detail Pembelian</h3>
           <div className="space-y-3">
-            {transaction.details.map((detail, index) => (
+            {transaction.items.map((detail, index) => (
               <div key={index} className="flex justify-between items-start">
                 <div className="flex-1">
                   <p className="font-medium text-gray-900">
@@ -174,11 +174,11 @@ export default function TransactionDetailPage() {
                   <p className="text-xs text-gray-500">SKU: {detail.product.sku}</p>
                   <p className="text-sm text-gray-600 mt-1">
                     {detail.quantity} {detail.product.unit} × Rp{' '}
-                    {detail.price.toLocaleString('id-ID')}
+                    {Number(detail.priceUnit).toLocaleString('id-ID')}
                   </p>
                 </div>
                 <p className="font-semibold text-gray-900">
-                  Rp {detail.subtotal.toLocaleString('id-ID')}
+                  Rp {Number(detail.subtotal).toLocaleString('id-ID')}
                 </p>
               </div>
             ))}
@@ -190,22 +190,24 @@ export default function TransactionDetailPage() {
           <div className="flex justify-between text-lg">
             <span className="font-medium text-gray-700">Subtotal:</span>
             <span className="font-semibold">
-              Rp {transaction.totalAmount.toLocaleString('id-ID')}
+              Rp {Number(transaction.totalAmount).toLocaleString('id-ID')}
             </span>
           </div>
 
-          <div className="flex justify-between text-lg">
-            <span className="font-medium text-gray-700">Dibayar:</span>
-            <span className="font-semibold">
-              Rp {transaction.amountPaid.toLocaleString('id-ID')}
-            </span>
-          </div>
+          {transaction.amountReceived && (
+            <div className="flex justify-between text-lg">
+              <span className="font-medium text-gray-700">Dibayar:</span>
+              <span className="font-semibold">
+                Rp {Number(transaction.amountReceived).toLocaleString('id-ID')}
+              </span>
+            </div>
+          )}
 
-          {transaction.changeAmount > 0 && (
+          {transaction.changeAmount && Number(transaction.changeAmount) > 0 && (
             <div className="flex justify-between text-lg">
               <span className="font-medium text-gray-700">Kembalian:</span>
               <span className="font-semibold text-green-600">
-                Rp {transaction.changeAmount.toLocaleString('id-ID')}
+                Rp {Number(transaction.changeAmount).toLocaleString('id-ID')}
               </span>
             </div>
           )}
@@ -214,7 +216,7 @@ export default function TransactionDetailPage() {
             <div className="flex justify-between text-2xl font-bold">
               <span>TOTAL:</span>
               <span className="text-blue-600">
-                Rp {transaction.totalAmount.toLocaleString('id-ID')}
+                Rp {Number(transaction.totalAmount).toLocaleString('id-ID')}
               </span>
             </div>
           </div>

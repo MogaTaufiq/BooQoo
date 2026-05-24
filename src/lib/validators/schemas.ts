@@ -78,10 +78,10 @@ export const createTransactionSchema = z.object({
 // Inventory schemas
 export const stockInSchema = z.object({
   productId: z.string().uuid(),
-  variantId: z.string().uuid().optional(),
+  variantId: z.string().uuid().optional().or(z.literal('')),
   quantity: z.number().int().positive('Jumlah harus lebih dari 0'),
-  batchCode: z.string().optional(),
-  expiryDate: z.date().optional(),
+  batchCode: z.string().optional().or(z.literal('')),
+  expiryDate: z.string().datetime().optional().or(z.literal('')),
   costPrice: z.number().positive().optional(),
 });
 

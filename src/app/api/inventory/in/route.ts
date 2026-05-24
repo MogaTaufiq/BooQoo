@@ -45,6 +45,9 @@ export async function POST(request: NextRequest) {
 
     const data = validationResult.data;
 
+    // Convert expiryDate string to Date if provided
+    const expiryDate = data.expiryDate ? new Date(data.expiryDate) : undefined;
+
     // Check if product exists and belongs to user's store
     const product = await prisma.product.findFirst({
       where: {
@@ -116,10 +119,10 @@ export async function POST(request: NextRequest) {
           data: {
             storeId: token.storeId as string,
             productId: data.productId,
-            variantId: data.variantId,
+            variantId: data.variantId || null,
             quantity: data.quantity,
-            batchCode: data.batchCode,
-            expiryDate: data.expiryDate,
+            batchCode: data.batchCode || null,
+            expiryDate: expiryDate,
             costPrice: data.costPrice,
             lastCountedAt: new Date(),
           },
@@ -131,13 +134,13 @@ export async function POST(request: NextRequest) {
         data: {
           storeId: token.storeId as string,
           productId: data.productId,
-          variantId: data.variantId,
+          variantId: data.variantId || null,
           type: 'IN',
           quantity: data.quantity,
-          batchCode: data.batchCode,
+          batchCode: data.batchCode || null,
           reason: 'Restock',
           referenceId: inventoryItem.id,
-          performedBy: token.id as string,
+          performedBy: token.userId as string,
         },
       });
 

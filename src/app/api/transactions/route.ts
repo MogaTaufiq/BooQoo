@@ -42,12 +42,12 @@ export async function GET(request: NextRequest) {
     }
 
     if (startDate || endDate) {
-      where.createdAt = {};
+      where.transactionDate = {};
       if (startDate) {
-        where.createdAt.gte = new Date(startDate);
+        where.transactionDate.gte = new Date(startDate);
       }
       if (endDate) {
-        where.createdAt.lte = new Date(endDate);
+        where.transactionDate.lte = new Date(endDate);
       }
     }
 

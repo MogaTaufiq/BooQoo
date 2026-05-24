@@ -74,7 +74,7 @@ export default function TransactionsPage() {
   };
 
   const getTotalSales = () => {
-    return transactions.reduce((sum, t) => sum + t.totalAmount, 0);
+    return transactions.reduce((sum, t) => sum + Number(t.totalAmount), 0);
   };
 
   const paymentMethodLabel: any = {
@@ -172,13 +172,13 @@ export default function TransactionsPage() {
                 <div className="flex justify-between items-start mb-3">
                   <div>
                     <p className="text-sm text-gray-500">
-                      {new Date(transaction.createdAt).toLocaleString('id-ID', {
+                      {new Date(transaction.transactionDate).toLocaleString('id-ID', {
                         dateStyle: 'medium',
                         timeStyle: 'short',
                       })}
                     </p>
                     <p className="text-xs text-gray-500 mt-1">
-                      Kasir: {transaction.user.name}
+                      Kasir: {transaction.createdByUser.name}
                     </p>
                     {transaction.customerName && (
                       <p className="text-xs text-gray-500">
@@ -188,7 +188,7 @@ export default function TransactionsPage() {
                   </div>
                   <div className="text-right">
                     <p className="text-2xl font-bold text-gray-900">
-                      Rp {transaction.totalAmount.toLocaleString('id-ID')}
+                      Rp {Number(transaction.totalAmount).toLocaleString('id-ID')}
                     </p>
                     <span className="inline-block px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full mt-1">
                       {paymentMethodLabel[transaction.paymentMethod]}
@@ -198,22 +198,22 @@ export default function TransactionsPage() {
 
                 <div className="border-t pt-3">
                   <p className="text-sm text-gray-600 mb-2">
-                    {transaction.details.length} item
+                    {transaction.items.length} item
                   </p>
                   <div className="space-y-1">
-                    {transaction.details.slice(0, 3).map((detail, index) => (
+                    {transaction.items.slice(0, 3).map((detail, index) => (
                       <div key={index} className="flex justify-between text-sm">
                         <span className="text-gray-700">
                           {detail.quantity}x {detail.productName}
                         </span>
                         <span className="text-gray-900 font-medium">
-                          Rp {detail.subtotal.toLocaleString('id-ID')}
+                          Rp {Number(detail.subtotal).toLocaleString('id-ID')}
                         </span>
                       </div>
                     ))}
-                    {transaction.details.length > 3 && (
+                    {transaction.items.length > 3 && (
                       <p className="text-xs text-gray-500">
-                        +{transaction.details.length - 3} item lainnya
+                        +{transaction.items.length - 3} item lainnya
                       </p>
                     )}
                   </div>

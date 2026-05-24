@@ -5,12 +5,13 @@
 # ==================================================
 
 # ==================== STAGE 1: Dependencies ====================
-FROM node:18-alpine AS deps
+FROM node:18-slim AS deps
 
 # Install dependencies yang diperlukan
-RUN apk add --no-cache \
-    libc6-compat \
-    openssl
+RUN apt-get update && apt-get install -y \
+    openssl \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
@@ -22,12 +23,13 @@ RUN npm ci --only=production && \
     npm cache clean --force
 
 # ==================== STAGE 2: Builder ====================
-FROM node:18-alpine AS builder
+FROM node:18-slim AS builder
 
 # Install OpenSSL untuk Prisma
-RUN apk add --no-cache \
-    libc6-compat \
-    openssl
+RUN apt-get update && apt-get install -y \
+    openssl \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
@@ -47,13 +49,14 @@ ENV NODE_ENV=production
 RUN npm run build
 
 # ==================== STAGE 3: Runner ====================
-FROM node:18-alpine AS runner
+FROM node:18-slim AS runner
 
 # Install runtime dependencies
-RUN apk add --no-cache \
+RUN apt-get update && apt-get install -y \
     openssl \
     ca-certificates \
-    curl
+    curl \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 

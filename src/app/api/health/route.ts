@@ -15,7 +15,7 @@ export async function GET() {
 
     // Get database info
     const dbCheck = await prisma.$queryRaw<Array<{ count: bigint }>>`
-      SELECT COUNT(*) as count FROM "User"
+      SELECT COUNT(*) as count FROM users
     `;
 
     const userCount = Number(dbCheck[0].count);

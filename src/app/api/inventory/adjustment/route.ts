@@ -109,12 +109,12 @@ export async function POST(request: NextRequest) {
         data: {
           storeId: token.storeId as string,
           productId: data.productId,
-          variantId: data.variantId,
+          variantId: data.variantId || null,
           type: 'ADJUSTMENT',
           quantity: Math.abs(data.quantity),
           reason: `${data.reason}${data.notes ? ': ' + data.notes : ''}`,
           referenceId: inventoryItem.id,
-          performedBy: token.id as string,
+          performedBy: token.userId as string,
         },
       });
 

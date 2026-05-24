@@ -54,7 +54,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Get products with variants
-    const [products, total] = await Promise.all([
+    const [productsRaw, total] = await Promise.all([
       prisma.product.findMany({
         where,
         include: {
@@ -66,6 +66,19 @@ export async function GET(request: NextRequest) {
       }),
       prisma.product.count({ where }),
     ]);
+
+    // Transform products to include 'price' field for frontend compatibility
+    const products = productsRaw.map((product) => ({
+      ...product,
+      price: Number(product.priceSell), // Add price field from priceSell
+      priceSell: Number(product.priceSell),
+      priceCost: product.priceCost ? Number(product.priceCost) : null,
+      variants: product.variants?.map((variant) => ({
+        ...variant,
+        price: Number(product.priceSell) + Number(variant.priceModifier || 0),
+        priceModifier: Number(variant.priceModifier || 0),
+      })),
+    }));
 
     const totalPages = Math.ceil(total / limit);
 

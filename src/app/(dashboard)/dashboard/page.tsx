@@ -36,7 +36,7 @@ export default function DashboardPage() {
         const transactions = transactionsResult.data;
         setTodayTransactions(transactions.length);
         setTodaySales(
-          transactions.reduce((sum: number, t: any) => sum + t.totalAmount, 0)
+          transactions.reduce((sum: number, t: any) => sum + Number(t.totalAmount), 0)
         );
       }
     } catch (error) {
