@@ -10,22 +10,20 @@ import { Button, Card, Alert } from '@/components/ui';
 
 interface Transaction {
   id: string;
+  transactionDate: string;
   totalAmount: number;
   paymentMethod: string;
-  amountPaid: number;
-  changeAmount: number;
   customerName?: string;
-  status: string;
-  createdAt: Date;
-  details: Array<{
+  createdByUser: {
+    name: string;
+    email: string;
+  };
+  items: Array<{
+    id: string;
     productName: string;
     quantity: number;
-    price: number;
     subtotal: number;
   }>;
-  user: {
-    name: string;
-  };
 }
 
 export default function TransactionsPage() {
