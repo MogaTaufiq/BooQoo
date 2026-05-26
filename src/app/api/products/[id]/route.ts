@@ -8,6 +8,8 @@ import { prisma } from '@/lib/db/prisma';
 import { updateProductSchema } from '@/lib/validators/schemas';
 import type { ApiResponse } from '@/types';
 
+export const dynamic = 'force-dynamic';
+
 // GET /api/products/[id] - Get product by ID
 export async function GET(
   request: NextRequest,

@@ -7,6 +7,8 @@ import { getToken } from 'next-auth/jwt';
 import { prisma } from '@/lib/db/prisma';
 import type { ApiResponse } from '@/types';
 
+export const dynamic = 'force-dynamic';
+
 // GET /api/inventory - Get current stock levels for all products
 export async function GET(request: NextRequest) {
   try {

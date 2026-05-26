@@ -9,8 +9,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 // ============================================
@@ -164,6 +165,7 @@ model InventoryItem {
 
   @@index([storeId])
   @@index([productId])
+  @@index([variantId])
   @@index([storeId, productId, variantId])
   @@index([batchCode])
   @@index([expiryDate])
@@ -190,6 +192,7 @@ model StockMovement {
 
   @@index([storeId])
   @@index([productId])
+  @@index([performedBy])
   @@index([storeId, createdAt])
   @@index([referenceId])
   @@map("stock_movements")
@@ -276,5 +279,6 @@ model TransactionDetail {
 
   @@index([transactionId])
   @@index([productId])
+  @@index([variantId])
   @@map("transaction_details")
 }

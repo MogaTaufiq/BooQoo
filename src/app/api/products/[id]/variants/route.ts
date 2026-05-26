@@ -8,6 +8,8 @@ import { prisma } from '@/lib/db/prisma';
 import type { ApiResponse } from '@/types';
 import { z } from 'zod';
 
+export const dynamic = 'force-dynamic';
+
 const variantSchema = z.object({
   name: z.string().min(2, 'Nama varian minimal 2 karakter'),
   skuSuffix: z.string().min(1, 'SKU suffix harus diisi'),

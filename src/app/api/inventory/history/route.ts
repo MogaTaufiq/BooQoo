@@ -7,6 +7,8 @@ import { getToken } from 'next-auth/jwt';
 import { prisma } from '@/lib/db/prisma';
 import type { ApiResponse, PaginatedResponse } from '@/types';
 
+export const dynamic = 'force-dynamic';
+
 // GET /api/inventory/history - Get stock movement history
 export async function GET(request: NextRequest) {
   try {

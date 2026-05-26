@@ -8,6 +8,8 @@ import { prisma } from '@/lib/db/prisma';
 import { createProductSchema } from '@/lib/validators/schemas';
 import type { ApiResponse, PaginatedResponse } from '@/types';
 
+export const dynamic = 'force-dynamic';
+
 // GET /api/products - List products with pagination and filters
 export async function GET(request: NextRequest) {
   try {
