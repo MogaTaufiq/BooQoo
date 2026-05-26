@@ -30,14 +30,17 @@ export const Header = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <div className="flex items-center">
-            <Link href="/dashboard" className="text-2xl font-bold text-blue-600">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
+              <span className="text-white font-bold text-sm">B</span>
+            </div>
+            <Link href="/dashboard" className="text-2xl font-bold text-primary">
               BooQoo
             </Link>
           </div>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex space-x-8">
+          <nav className="hidden md:flex space-x-1">
             {navigation.map((item) => {
               const isActive = pathname === item.href;
               return (
@@ -45,11 +48,11 @@ export const Header = () => {
                   key={item.name}
                   href={item.href}
                   className={`
-                    inline-flex items-center px-1 pt-1 text-sm font-medium border-b-2
+                    inline-flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors
                     ${
                       isActive
-                        ? 'border-blue-500 text-gray-900'
-                        : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                        ? 'bg-primary-50 text-primary'
+                        : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
                     }
                   `}
                 >

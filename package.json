@@ -1,6 +1,6 @@
 {
   "name": "booqoo-pos",
-  "version": "0.1.0",
+  "version": "1.5.0",
   "description": "BooQoo: POS & Stock Management for Home-Based UMKM",
   "private": true,
   "scripts": {
@@ -36,6 +36,7 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.48.0",
+    "recharts": "^3.8.1",
     "tailwindcss": "^3.4.1",
     "typescript": "^5.3.0",
     "uuid": "^9.0.1",

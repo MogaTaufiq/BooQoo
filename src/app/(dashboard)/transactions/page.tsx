@@ -6,7 +6,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Button, Card, Alert } from '@/components/ui';
+import { Button, Card, Alert, EmptyState, SkeletonCard } from '@/components/ui';
 
 interface Transaction {
   id: string;
@@ -104,7 +104,7 @@ export default function TransactionsPage() {
 
         <Card className="p-4">
           <h3 className="text-sm font-medium text-gray-600 mb-2">Rata-rata</h3>
-          <p className="text-3xl font-bold text-blue-600">
+          <p className="text-3xl font-bold text-primary">
             Rp{' '}
             {transactions.length > 0
               ? Math.round(getTotalSales() / transactions.length).toLocaleString('id-ID')
@@ -123,8 +123,8 @@ export default function TransactionsPage() {
             }}
             className={`px-4 py-2 rounded-lg text-sm font-medium ${
               filter === 'all'
-                ? 'bg-blue-600 text-white'
-                : 'bg-gray-200 text-gray-700'
+                ? 'bg-primary text-white'
+                : 'bg-gray-100 text-gray-700'
             }`}
           >
             Semua
@@ -136,8 +136,8 @@ export default function TransactionsPage() {
             }}
             className={`px-4 py-2 rounded-lg text-sm font-medium ${
               filter === 'today'
-                ? 'bg-blue-600 text-white'
-                : 'bg-gray-200 text-gray-700'
+                ? 'bg-primary text-white'
+                : 'bg-gray-100 text-gray-700'
             }`}
           >
             Hari Ini
@@ -147,16 +147,21 @@ export default function TransactionsPage() {
 
       {/* Transactions List */}
       {isLoading ? (
-        <div className="text-center py-12">
-          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-          <p className="mt-2 text-gray-600">Memuat data transaksi...</p>
+        <div className="space-y-4">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <SkeletonCard key={i} />
+          ))}
         </div>
       ) : error ? (
         <Alert type="error" message={error} />
       ) : transactions.length === 0 ? (
-        <Card className="p-12 text-center">
-          <p className="text-gray-600 mb-4">Belum ada transaksi</p>
-          <Button onClick={() => router.push('/checkout')}>Buat Transaksi Pertama</Button>
+        <Card>
+          <EmptyState
+            title="Belum ada transaksi"
+            description="Transaksi akan muncul setelah Anda melakukan penjualan pertama"
+            actionLabel="Buat Transaksi Pertama"
+            onAction={() => router.push('/checkout')}
+          />
         </Card>
       ) : (
         <>

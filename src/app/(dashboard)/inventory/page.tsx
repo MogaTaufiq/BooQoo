@@ -6,7 +6,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Button, Input, Card, Alert } from '@/components/ui';
+import { Button, Input, Card, Alert, Badge, EmptyState, SkeletonTable } from '@/components/ui';
 
 interface InventoryItem {
   productId: string;
@@ -130,8 +130,8 @@ export default function InventoryPage() {
             onClick={() => setFilter('all')}
             className={`px-3 py-1 rounded-full text-sm ${
               filter === 'all'
-                ? 'bg-blue-600 text-white'
-                : 'bg-gray-200 text-gray-700'
+                ? 'bg-primary text-white'
+                : 'bg-gray-100 text-gray-700'
             }`}
           >
             Semua Produk
@@ -161,20 +161,19 @@ export default function InventoryPage() {
 
       {/* Inventory List */}
       {isLoading ? (
-        <div className="text-center py-12">
-          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-          <p className="mt-2 text-gray-600">Memuat data stok...</p>
-        </div>
+        <Card className="p-6">
+          <SkeletonTable rows={5} />
+        </Card>
       ) : error ? (
         <Alert type="error" message={error} />
       ) : inventory.length === 0 ? (
-        <Card className="p-12 text-center">
-          <p className="text-gray-600 mb-4">
-            {filter !== 'all' ? 'Tidak ada produk yang sesuai filter' : 'Belum ada stok'}
-          </p>
-          <Button onClick={() => router.push('/inventory/stock-in')}>
-            Tambah Stok Pertama
-          </Button>
+        <Card>
+          <EmptyState
+            title={filter !== 'all' ? 'Tidak ada hasil' : 'Belum ada stok'}
+            description={filter !== 'all' ? 'Tidak ada produk yang sesuai filter saat ini' : 'Stok akan muncul setelah Anda melakukan penambahan stok pertama'}
+            actionLabel={filter === 'all' ? 'Tambah Stok Pertama' : undefined}
+            onAction={filter === 'all' ? () => router.push('/inventory/stock-in') : undefined}
+          />
         </Card>
       ) : (
         <div className="space-y-4">
@@ -187,14 +186,10 @@ export default function InventoryPage() {
                       {item.productName}
                     </h3>
                     {item.isLowStock && (
-                      <span className="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full">
-                        Stok Menipis
-                      </span>
+                      <Badge variant="warning">Stok Menipis</Badge>
                     )}
                     {item.hasExpiringSoon && (
-                      <span className="px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full">
-                        Akan Kedaluwarsa
-                      </span>
+                      <Badge variant="danger">Akan Kedaluwarsa</Badge>
                     )}
                   </div>
 

@@ -6,7 +6,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Button, Input, Card, Alert } from '@/components/ui';
+import { Button, Input, Card, Alert, SkeletonCard } from '@/components/ui';
 import { useCartStore } from '@/store/cartStore';
 
 interface Product {
@@ -189,8 +189,10 @@ export default function CheckoutPage() {
 
             <div className="flex-1 overflow-y-auto space-y-2">
               {isLoading ? (
-                <div className="text-center py-8">
-                  <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                <div className="space-y-2">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <SkeletonCard key={i} />
+                  ))}
                 </div>
               ) : filteredProducts.length === 0 ? (
                 <p className="text-center text-gray-500 py-8">Produk tidak ditemukan</p>
@@ -211,7 +213,7 @@ export default function CheckoutPage() {
                           <p className="text-sm text-gray-600">
                             Stok: {stock} {product.unit}
                           </p>
-                          <p className="text-lg font-bold text-blue-600 mt-1">
+                          <p className="text-lg font-bold text-primary mt-1">
                             Rp {product.price.toLocaleString('id-ID')}
                           </p>
                         </div>
@@ -326,8 +328,8 @@ export default function CheckoutPage() {
                           onClick={() => setPaymentMethod(method.value as any)}
                           className={`py-2 px-3 rounded text-sm font-medium ${
                             paymentMethod === method.value
-                              ? 'bg-blue-600 text-white'
-                              : 'bg-gray-200 text-gray-700'
+                              ? 'bg-primary text-white'
+                              : 'bg-gray-100 text-gray-700'
                           }`}
                         >
                           {method.label}

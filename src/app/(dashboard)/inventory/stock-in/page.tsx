@@ -133,7 +133,7 @@ function StockInForm() {
                   setVariantId(''); // Reset variant when product changes
                 }}
                 required
-                className="block w-full px-4 py-2.5 text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="block w-full px-4 py-2.5 text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
               >
                 <option value="">Pilih produk...</option>
                 {products.map((product) => (
@@ -152,7 +152,7 @@ function StockInForm() {
                 <select
                   value={variantId}
                   onChange={(e) => setVariantId(e.target.value)}
-                  className="block w-full px-4 py-2.5 text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="block w-full px-4 py-2.5 text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                 >
                   <option value="">Tanpa varian</option>
                   {selectedProduct.variants.map((variant) => (

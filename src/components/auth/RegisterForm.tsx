@@ -118,7 +118,7 @@ export const RegisterForm = () => {
 
       <div className="text-center text-sm text-gray-600">
         Sudah punya akun?{' '}
-        <Link href="/login" className="text-blue-600 hover:text-blue-700 font-medium">
+        <Link href="/login" className="text-primary hover:text-primary-700 font-medium">
           Masuk di sini
         </Link>
       </div>

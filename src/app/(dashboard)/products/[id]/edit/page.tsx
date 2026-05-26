@@ -7,7 +7,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { ProductForm } from '@/components/products/ProductForm';
-import { Alert } from '@/components/ui';
+import { Alert, SkeletonCard } from '@/components/ui';
 import type { UpdateProductInput } from '@/types';
 
 export default function EditProductPage({ params }: { params: { id: string } }) {
@@ -71,9 +71,8 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
 
   if (isFetching) {
     return (
-      <div className="text-center py-12">
-        <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-        <p className="mt-2 text-gray-600">Memuat data produk...</p>
+      <div className="space-y-6">
+        <SkeletonCard className="h-96" />
       </div>
     );
   }

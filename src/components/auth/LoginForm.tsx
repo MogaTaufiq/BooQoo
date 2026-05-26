@@ -89,7 +89,7 @@ export const LoginForm = () => {
 
       <div className="text-center text-sm text-gray-600">
         Belum punya akun?{' '}
-        <Link href="/register" className="text-blue-600 hover:text-blue-700 font-medium">
+        <Link href="/register" className="text-primary hover:text-primary-700 font-medium">
           Daftar sekarang
         </Link>
       </div>

@@ -5,7 +5,7 @@
 // ============================================
 
 import { useState, useEffect } from 'react';
-import { Button, Input, Card, Alert } from '@/components/ui';
+import { Button, Input, Card, Alert, SkeletonCard } from '@/components/ui';
 
 export default function SettingsPage() {
   const [isLoading, setIsLoading] = useState(true);
@@ -92,9 +92,9 @@ export default function SettingsPage() {
 
   if (isLoading) {
     return (
-      <div className="text-center py-12">
-        <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-        <p className="mt-2 text-gray-600">Memuat pengaturan...</p>
+      <div className="space-y-6">
+        <SkeletonCard className="h-64" />
+        <SkeletonCard className="h-48" />
       </div>
     );
   }
@@ -133,7 +133,7 @@ export default function SettingsPage() {
                 value={formData.description}
                 onChange={(e) => handleChange('description', e.target.value)}
                 rows={3}
-                className="block w-full px-4 py-2.5 text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="block w-full px-4 py-2.5 text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                 placeholder="Deskripsi singkat tentang toko Anda"
               />
             </div>
@@ -154,7 +154,7 @@ export default function SettingsPage() {
                 value={formData.address}
                 onChange={(e) => handleChange('address', e.target.value)}
                 rows={3}
-                className="block w-full px-4 py-2.5 text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="block w-full px-4 py-2.5 text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                 placeholder="Alamat lengkap toko"
               />
             </div>
@@ -193,11 +193,11 @@ export default function SettingsPage() {
         </Card>
 
         {/* Info Card */}
-        <Card className="p-6 bg-blue-50 border border-blue-200">
+        <Card className="p-6 bg-primary-50 border border-primary-200">
           <div className="flex items-start">
             <div className="flex-shrink-0">
               <svg
-                className="h-5 w-5 text-blue-600"
+                className="h-5 w-5 text-primary"
                 fill="currentColor"
                 viewBox="0 0 20 20"
               >

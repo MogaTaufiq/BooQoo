@@ -5,7 +5,10 @@
 // ============================================
 
 import { useState, useEffect } from 'react';
-import { Card, Alert } from '@/components/ui';
+import { Card, Alert, Badge, Table, SkeletonCard } from '@/components/ui';
+import { SalesTrendChart } from '@/components/charts/SalesTrendChart';
+import { PaymentMethodChart } from '@/components/charts/PaymentMethodChart';
+import { TopProductsChart } from '@/components/charts/TopProductsChart';
 
 export default function ReportsPage() {
   const [activeTab, setActiveTab] = useState<'sales' | 'inventory'>('sales');
@@ -113,7 +116,7 @@ export default function ReportsPage() {
             onClick={() => setActiveTab('sales')}
             className={`pb-3 px-1 border-b-2 font-medium text-sm ${
               activeTab === 'sales'
-                ? 'border-blue-600 text-blue-600'
+                ? 'border-primary text-primary'
                 : 'border-transparent text-gray-500 hover:text-gray-700'
             }`}
           >
@@ -123,7 +126,7 @@ export default function ReportsPage() {
             onClick={() => setActiveTab('inventory')}
             className={`pb-3 px-1 border-b-2 font-medium text-sm ${
               activeTab === 'inventory'
-                ? 'border-blue-600 text-blue-600'
+                ? 'border-primary text-primary'
                 : 'border-transparent text-gray-500 hover:text-gray-700'
             }`}
           >
@@ -209,9 +212,9 @@ export default function ReportsPage() {
           </Card>
 
           {isLoading ? (
-            <div className="text-center py-12">
-              <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-              <p className="mt-2 text-gray-600">Memuat laporan...</p>
+            <div className="space-y-4">
+              <SkeletonCard className="h-48" />
+              <SkeletonCard className="h-64" />
             </div>
           ) : salesData ? (
             <>
@@ -233,7 +236,7 @@ export default function ReportsPage() {
 
                 <Card className="p-6">
                   <h3 className="text-sm font-medium text-gray-600 mb-2">Rata-rata Transaksi</h3>
-                  <p className="text-3xl font-bold text-blue-600">
+                  <p className="text-3xl font-bold text-primary">
                     Rp {Math.round(salesData.summary.averageTransaction).toLocaleString('id-ID')}
                   </p>
                 </Card>
@@ -244,20 +247,28 @@ export default function ReportsPage() {
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">
                   Metode Pembayaran
                 </h3>
-                <div className="space-y-3">
-                  {Object.entries(salesData.paymentMethodBreakdown).map(([method, data]: any) => (
-                    <div key={method} className="flex justify-between items-center">
-                      <div>
-                        <p className="font-medium text-gray-900">
-                          {paymentMethodLabels[method] || method}
-                        </p>
-                        <p className="text-sm text-gray-600">{data.count} transaksi</p>
-                      </div>
-                      <p className="text-lg font-bold text-gray-900">
-                        Rp {data.total.toLocaleString('id-ID')}
-                      </p>
-                    </div>
-                  ))}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <PaymentMethodChart
+                    data={salesData.paymentMethodBreakdown}
+                    labels={paymentMethodLabels}
+                  />
+                  <div className="space-y-3">
+                    {Object.entries(salesData.paymentMethodBreakdown)
+                      .sort(([, a]: any, [, b]: any) => b.total - a.total)
+                      .map(([method, data]: any) => (
+                        <div key={method} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                          <div>
+                            <p className="font-medium text-gray-900">
+                              {paymentMethodLabels[method] || method}
+                            </p>
+                            <p className="text-sm text-gray-600">{data.count} transaksi</p>
+                          </div>
+                          <p className="text-lg font-bold text-gray-900">
+                            Rp {data.total.toLocaleString('id-ID')}
+                          </p>
+                        </div>
+                      ))}
+                  </div>
                 </div>
               </Card>
 
@@ -266,87 +277,57 @@ export default function ReportsPage() {
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">
                   Top 10 Produk Terlaris
                 </h3>
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead>
-                      <tr className="border-b">
-                        <th className="text-left py-2 px-2 text-sm font-medium text-gray-600">
-                          #
-                        </th>
-                        <th className="text-left py-2 px-2 text-sm font-medium text-gray-600">
-                          Produk
-                        </th>
-                        <th className="text-left py-2 px-2 text-sm font-medium text-gray-600">
-                          Kategori
-                        </th>
-                        <th className="text-right py-2 px-2 text-sm font-medium text-gray-600">
-                          Terjual
-                        </th>
-                        <th className="text-right py-2 px-2 text-sm font-medium text-gray-600">
-                          Pendapatan
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {salesData.topProducts.map((product: any, index: number) => (
-                        <tr key={product.productId} className="border-b">
-                          <td className="py-3 px-2 text-sm text-gray-900">{index + 1}</td>
-                          <td className="py-3 px-2 text-sm font-medium text-gray-900">
-                            {product.productName}
-                          </td>
-                          <td className="py-3 px-2 text-sm text-gray-600">
-                            {product.category || '-'}
-                          </td>
-                          <td className="py-3 px-2 text-sm text-gray-900 text-right">
-                            {product.quantity}
-                          </td>
-                          <td className="py-3 px-2 text-sm font-semibold text-gray-900 text-right">
-                            Rp {product.revenue.toLocaleString('id-ID')}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <TopProductsChart data={salesData.topProducts} />
+                  <div className="overflow-x-auto">
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-sm">
+                        <thead>
+                          <tr className="border-b border-gray-200">
+                            <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 uppercase w-8">#</th>
+                            <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 uppercase">Produk</th>
+                            <th className="px-3 py-2 text-right text-xs font-semibold text-gray-500 uppercase">Terjual</th>
+                            <th className="px-3 py-2 text-right text-xs font-semibold text-gray-500 uppercase">Pendapatan</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-100">
+                          {salesData.topProducts.map((p: any, i: number) => (
+                            <tr key={p.productId}>
+                              <td className="px-3 py-2 text-gray-500">{i + 1}</td>
+                              <td className="px-3 py-2 font-medium text-gray-900">{p.productName}</td>
+                              <td className="px-3 py-2 text-right text-gray-700">{p.quantity}</td>
+                              <td className="px-3 py-2 text-right font-semibold text-gray-900">Rp {p.revenue.toLocaleString('id-ID')}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
                 </div>
+              </Card>
+
+              {/* Sales Trend Chart */}
+              <Card className="mb-6 p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                  Tren Penjualan
+                </h3>
+                <SalesTrendChart data={salesData.salesByDate} groupBy={groupBy} />
               </Card>
 
               {/* Sales by Date */}
               <Card className="p-6">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                  Penjualan Per {groupBy === 'day' ? 'Hari' : groupBy === 'week' ? 'Minggu' : 'Bulan'}
+                  Detail Per {groupBy === 'day' ? 'Hari' : groupBy === 'week' ? 'Minggu' : 'Bulan'}
                 </h3>
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead>
-                      <tr className="border-b">
-                        <th className="text-left py-2 px-2 text-sm font-medium text-gray-600">
-                          Tanggal
-                        </th>
-                        <th className="text-right py-2 px-2 text-sm font-medium text-gray-600">
-                          Transaksi
-                        </th>
-                        <th className="text-right py-2 px-2 text-sm font-medium text-gray-600">
-                          Pendapatan
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {salesData.salesByDate.map((item: any) => (
-                        <tr key={item.date} className="border-b">
-                          <td className="py-3 px-2 text-sm text-gray-900">
-                            {new Date(item.date).toLocaleDateString('id-ID')}
-                          </td>
-                          <td className="py-3 px-2 text-sm text-gray-900 text-right">
-                            {item.transactions}
-                          </td>
-                          <td className="py-3 px-2 text-sm font-semibold text-gray-900 text-right">
-                            Rp {item.revenue.toLocaleString('id-ID')}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                <Table
+                  data={salesData.salesByDate}
+                  keyExtractor={(item: any) => item.date}
+                  columns={[
+                    { key: 'date', header: 'Tanggal', render: (item: any) => new Date(item.date).toLocaleDateString('id-ID') },
+                    { key: 'transactions', header: 'Transaksi', className: 'text-right' },
+                    { key: 'revenue', header: 'Pendapatan', className: 'text-right font-semibold', render: (item: any) => `Rp ${item.revenue.toLocaleString('id-ID')}` },
+                  ]}
+                />
               </Card>
             </>
           ) : null}
@@ -357,9 +338,9 @@ export default function ReportsPage() {
       {activeTab === 'inventory' && (
         <div>
           {isLoading ? (
-            <div className="text-center py-12">
-              <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-              <p className="mt-2 text-gray-600">Memuat laporan...</p>
+            <div className="space-y-4">
+              <SkeletonCard className="h-48" />
+              <SkeletonCard className="h-64" />
             </div>
           ) : inventoryData ? (
             <>
@@ -397,76 +378,30 @@ export default function ReportsPage() {
               {/* Inventory Table */}
               <Card className="p-6">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">Detail Inventori</h3>
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead>
-                      <tr className="border-b">
-                        <th className="text-left py-2 px-2 text-sm font-medium text-gray-600">
-                          Produk
-                        </th>
-                        <th className="text-left py-2 px-2 text-sm font-medium text-gray-600">
-                          SKU
-                        </th>
-                        <th className="text-left py-2 px-2 text-sm font-medium text-gray-600">
-                          Kategori
-                        </th>
-                        <th className="text-right py-2 px-2 text-sm font-medium text-gray-600">
-                          Stok
-                        </th>
-                        <th className="text-right py-2 px-2 text-sm font-medium text-gray-600">
-                          Harga Jual
-                        </th>
-                        <th className="text-right py-2 px-2 text-sm font-medium text-gray-600">
-                          Nilai Total
-                        </th>
-                        <th className="text-center py-2 px-2 text-sm font-medium text-gray-600">
-                          Status
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {inventoryData.products.map((product: any) => (
-                        <tr key={product.productId} className="border-b hover:bg-gray-50">
-                          <td className="py-3 px-2 text-sm font-medium text-gray-900">
-                            {product.productName}
-                          </td>
-                          <td className="py-3 px-2 text-sm text-gray-600">{product.sku}</td>
-                          <td className="py-3 px-2 text-sm text-gray-600">
-                            {product.category || '-'}
-                          </td>
-                          <td className="py-3 px-2 text-sm text-gray-900 text-right">
-                            {product.totalStock} {product.unit}
-                          </td>
-                          <td className="py-3 px-2 text-sm text-gray-900 text-right">
-                            Rp {product.priceSell.toLocaleString('id-ID')}
-                          </td>
-                          <td className="py-3 px-2 text-sm font-semibold text-gray-900 text-right">
-                            Rp {product.totalValue.toLocaleString('id-ID')}
-                          </td>
-                          <td className="py-3 px-2 text-center">
-                            <div className="flex gap-1 justify-center">
-                              {product.isLowStock && (
-                                <span className="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full">
-                                  Low
-                                </span>
-                              )}
-                              {product.hasExpiringSoon && (
-                                <span className="px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full">
-                                  Exp
-                                </span>
-                              )}
-                              {!product.isLowStock && !product.hasExpiringSoon && (
-                                <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
-                                  OK
-                                </span>
-                              )}
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                <Table
+                  data={inventoryData.products}
+                  keyExtractor={(p: any) => p.productId}
+                  columns={[
+                    { key: 'productName', header: 'Produk', className: 'font-medium' },
+                    { key: 'sku', header: 'SKU' },
+                    { key: 'category', header: 'Kategori', render: (p: any) => p.category || '-' },
+                    { key: 'stock', header: 'Stok', className: 'text-right', render: (p: any) => `${p.totalStock} ${p.unit}` },
+                    { key: 'priceSell', header: 'Harga Jual', className: 'text-right', render: (p: any) => `Rp ${p.priceSell.toLocaleString('id-ID')}` },
+                    { key: 'totalValue', header: 'Nilai Total', className: 'text-right font-semibold', render: (p: any) => `Rp ${p.totalValue.toLocaleString('id-ID')}` },
+                    {
+                      key: 'status',
+                      header: 'Status',
+                      className: 'text-center',
+                      render: (p: any) => (
+                        <div className="flex gap-1 justify-center">
+                          {p.isLowStock && <Badge variant="warning">Low</Badge>}
+                          {p.hasExpiringSoon && <Badge variant="danger">Exp</Badge>}
+                          {!p.isLowStock && !p.hasExpiringSoon && <Badge variant="success">OK</Badge>}
+                        </div>
+                      ),
+                    },
+                  ]}
+                />
               </Card>
             </>
           ) : null}

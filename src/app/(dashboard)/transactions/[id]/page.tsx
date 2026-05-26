@@ -6,7 +6,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { Button, Card, Alert } from '@/components/ui';
+import { Button, Card, Alert, SkeletonCard } from '@/components/ui';
 
 interface TransactionDetail {
   id: string;
@@ -104,9 +104,9 @@ export default function TransactionDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="text-center py-12">
-        <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-        <p className="mt-2 text-gray-600">Memuat detail transaksi...</p>
+      <div className="space-y-4">
+        <SkeletonCard />
+        <SkeletonCard />
       </div>
     );
   }
@@ -234,7 +234,7 @@ export default function TransactionDetailPage() {
           <div className="pt-4 border-t-2 border-dashed">
             <div className="flex justify-between text-2xl font-bold">
               <span>TOTAL:</span>
-              <span className="text-blue-600">
+              <span className="text-primary">
                 Rp {Number(transaction.totalAmount).toLocaleString('id-ID')}
               </span>
             </div>

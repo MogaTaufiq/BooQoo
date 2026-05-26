@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { Button, Card, Alert } from '@/components/ui';
+import { Button, Card, Alert, Badge, Modal, SkeletonCard, toast } from '@/components/ui';
 
 export default function ProductDetailPage() {
   const params = useParams();
@@ -33,10 +33,33 @@ export default function ProductDetailPage() {
     }
   };
 
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const handleDelete = async () => {
+    setIsDeleting(true);
+    try {
+      const response = await fetch(`/api/products/${params.id}`, { method: 'DELETE' });
+      const result = await response.json();
+      if (result.success) {
+        toast.success('Produk berhasil dihapus');
+        router.push('/products');
+      } else {
+        toast.error(result.error?.message || 'Gagal menghapus produk');
+      }
+    } catch {
+      toast.error('Terjadi kesalahan saat menghapus produk');
+    } finally {
+      setIsDeleting(false);
+      setShowDeleteModal(false);
+    }
+  };
+
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-gray-600">Loading...</div>
+      <div className="space-y-6">
+        <SkeletonCard className="h-64" />
+        <SkeletonCard className="h-48" />
       </div>
     );
   }
@@ -90,15 +113,9 @@ export default function ProductDetailPage() {
             <div>
               <label className="text-sm font-semibold text-gray-600">Status</label>
               <p className="mt-1">
-                <span
-                  className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${
-                    product.isActive
-                      ? 'bg-green-100 text-green-800'
-                      : 'bg-gray-100 text-gray-800'
-                  }`}
-                >
+                <Badge variant={product.isActive ? 'success' : 'default'}>
                   {product.isActive ? 'Aktif' : 'Tidak Aktif'}
-                </span>
+                </Badge>
               </p>
             </div>
           </div>
@@ -223,8 +240,26 @@ export default function ProductDetailPage() {
           <Button onClick={() => router.push(`/products/${product.id}/edit`)}>
             Edit Produk
           </Button>
+          <Button variant="danger" onClick={() => setShowDeleteModal(true)}>
+            Hapus Produk
+          </Button>
         </div>
       </Card>
+
+      {/* Delete Confirmation Modal */}
+      <Modal isOpen={showDeleteModal} onClose={() => setShowDeleteModal(false)} title="Hapus Produk">
+        <p className="text-gray-600 mb-6">
+          Apakah Anda yakin ingin menghapus <strong>{product.name}</strong>? Tindakan ini tidak dapat dibatalkan.
+        </p>
+        <div className="flex gap-3 justify-end">
+          <Button variant="outline" onClick={() => setShowDeleteModal(false)}>
+            Batal
+          </Button>
+          <Button variant="danger" onClick={handleDelete} isLoading={isDeleting}>
+            Hapus
+          </Button>
+        </div>
+      </Modal>
     </div>
   );
 }

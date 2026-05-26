@@ -7,7 +7,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useProductStore } from '@/store/productStore';
-import { Button, Input, Card } from '@/components/ui';
+import { Button, Input, Card, Badge, EmptyState, SkeletonCard } from '@/components/ui';
 
 export default function ProductsPage() {
   const router = useRouter();
@@ -92,8 +92,8 @@ export default function ProductsPage() {
             onClick={() => setFilters({ isActive: undefined })}
             className={`px-3 py-1 rounded-full text-sm ${
               filters.isActive === undefined
-                ? 'bg-blue-600 text-white'
-                : 'bg-gray-200 text-gray-700'
+                ? 'bg-primary text-white'
+                : 'bg-gray-100 text-gray-700'
             }`}
           >
             Semua
@@ -102,8 +102,8 @@ export default function ProductsPage() {
             onClick={() => setFilters({ isActive: true })}
             className={`px-3 py-1 rounded-full text-sm ${
               filters.isActive === true
-                ? 'bg-blue-600 text-white'
-                : 'bg-gray-200 text-gray-700'
+                ? 'bg-primary text-white'
+                : 'bg-gray-100 text-gray-700'
             }`}
           >
             Aktif
@@ -112,8 +112,8 @@ export default function ProductsPage() {
             onClick={() => setFilters({ isActive: false })}
             className={`px-3 py-1 rounded-full text-sm ${
               filters.isActive === false
-                ? 'bg-blue-600 text-white'
-                : 'bg-gray-200 text-gray-700'
+                ? 'bg-primary text-white'
+                : 'bg-gray-100 text-gray-700'
             }`}
           >
             Tidak Aktif
@@ -123,16 +123,19 @@ export default function ProductsPage() {
 
       {/* Product List */}
       {isLoading ? (
-        <div className="text-center py-12">
-          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-          <p className="mt-2 text-gray-600">Memuat produk...</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <SkeletonCard key={i} />
+          ))}
         </div>
       ) : products.length === 0 ? (
-        <Card className="p-12 text-center">
-          <p className="text-gray-600 mb-4">Belum ada produk</p>
-          <Button onClick={() => router.push('/products/new')}>
-            Tambah Produk Pertama
-          </Button>
+        <Card>
+          <EmptyState
+            title="Belum ada produk"
+            description="Tambahkan produk pertama Anda untuk mulai berjualan"
+            actionLabel="Tambah Produk Pertama"
+            onAction={() => router.push('/products/new')}
+          />
         </Card>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -145,15 +148,9 @@ export default function ProductsPage() {
                   </h3>
                   <p className="text-sm text-gray-500">{product.sku}</p>
                 </div>
-                <span
-                  className={`px-2 py-1 rounded-full text-xs ${
-                    product.isActive
-                      ? 'bg-green-100 text-green-800'
-                      : 'bg-gray-100 text-gray-800'
-                  }`}
-                >
+                <Badge variant={product.isActive ? 'success' : 'default'}>
                   {product.isActive ? 'Aktif' : 'Tidak Aktif'}
-                </span>
+                </Badge>
               </div>
 
               {product.description && (
@@ -165,7 +162,7 @@ export default function ProductsPage() {
               <div className="flex justify-between items-center mb-3">
                 <div>
                   <p className="text-xs text-gray-500">Harga Jual</p>
-                  <p className="text-lg font-bold text-blue-600">
+                  <p className="text-lg font-bold text-primary">
                     Rp {product.priceSell.toLocaleString('id-ID')}
                   </p>
                 </div>

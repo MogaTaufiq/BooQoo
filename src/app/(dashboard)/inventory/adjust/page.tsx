@@ -144,7 +144,7 @@ function StockAdjustmentForm() {
                   setVariantId('');
                 }}
                 required
-                className="block w-full px-4 py-2.5 text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="block w-full px-4 py-2.5 text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
               >
                 <option value="">Pilih produk...</option>
                 {products.map((product) => (
@@ -163,7 +163,7 @@ function StockAdjustmentForm() {
                 <select
                   value={variantId}
                   onChange={(e) => setVariantId(e.target.value)}
-                  className="block w-full px-4 py-2.5 text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="block w-full px-4 py-2.5 text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                 >
                   <option value="">Tanpa varian</option>
                   {selectedProduct.variants.map((variant) => (
@@ -231,7 +231,7 @@ function StockAdjustmentForm() {
                 value={reason}
                 onChange={(e) => setReason(e.target.value)}
                 required
-                className="block w-full px-4 py-2.5 text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="block w-full px-4 py-2.5 text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
               >
                 <option value="">Pilih alasan...</option>
                 {adjustmentReasons.map((r) => (
@@ -250,7 +250,7 @@ function StockAdjustmentForm() {
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 rows={3}
-                className="block w-full px-4 py-2.5 text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="block w-full px-4 py-2.5 text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                 placeholder="Tambahkan catatan detail (opsional)"
               />
             </div>

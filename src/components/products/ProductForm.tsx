@@ -82,7 +82,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
               </label>
               <select
                 {...register('unit')}
-                className="block w-full px-4 py-2.5 text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="block w-full px-4 py-2.5 text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
               >
                 <option value="PCS">Pcs</option>
                 <option value="KG">Kg</option>
@@ -113,7 +113,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
             <textarea
               {...register('description')}
               rows={3}
-              className="block w-full px-4 py-2.5 text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="block w-full px-4 py-2.5 text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
               placeholder="Deskripsi produk (opsional)"
             />
             {errors.description && (

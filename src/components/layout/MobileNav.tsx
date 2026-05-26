@@ -80,11 +80,12 @@ export const MobileNav = () => {
               href={item.href}
               className={`
                 flex flex-col items-center justify-center py-2 px-3 min-w-0 flex-1
-                ${isActive ? 'text-blue-600' : 'text-gray-500'}
+                ${isActive ? 'text-primary' : 'text-gray-500'}
               `}
             >
-              <div className="h-6 w-6">{item.icon}</div>
-              <span className="text-xs mt-1">{item.name}</span>
+              <div className={`h-6 w-6 ${isActive ? 'drop-shadow-sm' : ''}`}>{item.icon}</div>
+              <span className={`text-xs mt-1 ${isActive ? 'font-semibold' : ''}`}>{item.name}</span>
+              {isActive && <div className="absolute -top-0.5 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-primary rounded-full" />}
             </Link>
           );
         })}
