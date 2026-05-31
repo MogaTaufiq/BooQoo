@@ -61,7 +61,7 @@ export default function DashboardPage() {
           <h3 className="text-sm font-medium text-gray-600 mb-2">
             Total Penjualan Hari Ini
           </h3>
-          <p className="text-3xl font-bold text-green-600">
+          <p className="text-2xl md:text-3xl font-bold text-green-600">
             Rp {todaySales.toLocaleString('id-ID')}
           </p>
           <p className="text-xs text-primary mt-1">Klik untuk lihat detail →</p>
@@ -69,19 +69,19 @@ export default function DashboardPage() {
 
         <Card className="p-6 cursor-pointer hover:shadow-lg transition-shadow" onClick={() => router.push('/transactions')}>
           <h3 className="text-sm font-medium text-gray-600 mb-2">Jumlah Transaksi</h3>
-          <p className="text-3xl font-bold text-gray-900">{todayTransactions}</p>
+          <p className="text-2xl md:text-3xl font-bold text-gray-900">{todayTransactions}</p>
           <p className="text-xs text-primary mt-1">Klik untuk lihat detail →</p>
         </Card>
 
         <Card className="p-6 cursor-pointer hover:shadow-lg transition-shadow" onClick={() => router.push('/inventory?filter=lowStock')}>
           <h3 className="text-sm font-medium text-gray-600 mb-2">Stok Menipis</h3>
-          <p className="text-3xl font-bold text-yellow-600">{lowStockCount}</p>
+          <p className="text-2xl md:text-3xl font-bold text-yellow-600">{lowStockCount}</p>
           <p className="text-xs text-primary mt-1">Klik untuk lihat detail →</p>
         </Card>
 
         <Card className="p-6 cursor-pointer hover:shadow-lg transition-shadow" onClick={() => router.push('/inventory?filter=expiring')}>
           <h3 className="text-sm font-medium text-gray-600 mb-2">Akan Kedaluwarsa</h3>
-          <p className="text-3xl font-bold text-red-600">{expiringCount}</p>
+          <p className="text-2xl md:text-3xl font-bold text-red-600">{expiringCount}</p>
           <p className="text-xs text-primary mt-1">Klik untuk lihat detail →</p>
         </Card>
       </div>

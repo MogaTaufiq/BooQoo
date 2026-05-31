@@ -5,7 +5,7 @@
 // ============================================
 
 import { useState, useEffect } from 'react';
-import { Card, Alert, Badge, Table, SkeletonCard } from '@/components/ui';
+import { Card, Alert, Badge, Table, Input, SkeletonCard } from '@/components/ui';
 import { SalesTrendChart } from '@/components/charts/SalesTrendChart';
 import { PaymentMethodChart } from '@/components/charts/PaymentMethodChart';
 import { TopProductsChart } from '@/components/charts/TopProductsChart';
@@ -165,33 +165,23 @@ export default function ReportsPage() {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Dari Tanggal
-                  </label>
-                  <input
-                    type="date"
-                    value={dateRange.startDate}
-                    onChange={(e) =>
-                      setDateRange({ ...dateRange, startDate: e.target.value })
-                    }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                  />
-                </div>
+                <Input
+                  label="Dari Tanggal"
+                  type="date"
+                  value={dateRange.startDate}
+                  onChange={(e) =>
+                    setDateRange({ ...dateRange, startDate: e.target.value })
+                  }
+                />
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Sampai Tanggal
-                  </label>
-                  <input
-                    type="date"
-                    value={dateRange.endDate}
-                    onChange={(e) =>
-                      setDateRange({ ...dateRange, endDate: e.target.value })
-                    }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                  />
-                </div>
+                <Input
+                  label="Sampai Tanggal"
+                  type="date"
+                  value={dateRange.endDate}
+                  onChange={(e) =>
+                    setDateRange({ ...dateRange, endDate: e.target.value })
+                  }
+                />
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -200,7 +190,7 @@ export default function ReportsPage() {
                   <select
                     value={groupBy}
                     onChange={(e) => setGroupBy(e.target.value as any)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                    className="w-full px-3 py-2.5 text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-1 focus:border-primary focus:ring-primary"
                   >
                     <option value="day">Per Hari</option>
                     <option value="week">Per Minggu</option>
@@ -222,21 +212,21 @@ export default function ReportsPage() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                 <Card className="p-6">
                   <h3 className="text-sm font-medium text-gray-600 mb-2">Total Pendapatan</h3>
-                  <p className="text-3xl font-bold text-green-600">
+                  <p className="text-2xl md:text-3xl font-bold text-green-600">
                     Rp {salesData.summary.totalRevenue.toLocaleString('id-ID')}
                   </p>
                 </Card>
 
                 <Card className="p-6">
                   <h3 className="text-sm font-medium text-gray-600 mb-2">Total Transaksi</h3>
-                  <p className="text-3xl font-bold text-gray-900">
+                  <p className="text-2xl md:text-3xl font-bold text-gray-900">
                     {salesData.summary.totalTransactions}
                   </p>
                 </Card>
 
                 <Card className="p-6">
                   <h3 className="text-sm font-medium text-gray-600 mb-2">Rata-rata Transaksi</h3>
-                  <p className="text-3xl font-bold text-primary">
+                  <p className="text-2xl md:text-3xl font-bold text-primary">
                     Rp {Math.round(salesData.summary.averageTransaction).toLocaleString('id-ID')}
                   </p>
                 </Card>
@@ -348,28 +338,28 @@ export default function ReportsPage() {
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
                 <Card className="p-6">
                   <h3 className="text-sm font-medium text-gray-600 mb-2">Total Produk</h3>
-                  <p className="text-3xl font-bold text-gray-900">
+                  <p className="text-2xl md:text-3xl font-bold text-gray-900">
                     {inventoryData.summary.totalProducts}
                   </p>
                 </Card>
 
                 <Card className="p-6">
                   <h3 className="text-sm font-medium text-gray-600 mb-2">Nilai Inventori</h3>
-                  <p className="text-3xl font-bold text-green-600">
+                  <p className="text-2xl md:text-3xl font-bold text-green-600">
                     Rp {inventoryData.summary.totalValue.toLocaleString('id-ID')}
                   </p>
                 </Card>
 
                 <Card className="p-6">
                   <h3 className="text-sm font-medium text-gray-600 mb-2">Stok Menipis</h3>
-                  <p className="text-3xl font-bold text-yellow-600">
+                  <p className="text-2xl md:text-3xl font-bold text-yellow-600">
                     {inventoryData.summary.lowStockCount}
                   </p>
                 </Card>
 
                 <Card className="p-6">
                   <h3 className="text-sm font-medium text-gray-600 mb-2">Akan Kedaluwarsa</h3>
-                  <p className="text-3xl font-bold text-red-600">
+                  <p className="text-2xl md:text-3xl font-bold text-red-600">
                     {inventoryData.summary.expiringCount}
                   </p>
                 </Card>

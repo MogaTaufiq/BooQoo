@@ -29,7 +29,16 @@
   }
 
   .animate-slide-up {
-    animation: slide-up 0.2s ease-out;
+    animation: slide-up 0.3s ease-out;
+  }
+
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  .animate-fade-in {
+    animation: fade-in 0.2s ease-out;
   }
 }
 
@@ -39,8 +48,7 @@
     font-size: 16px;
   }
 
-  button, a {
-    min-height: 48px;
-    min-width: 48px;
+  input, select, textarea {
+    font-size: 16px;
   }
 }

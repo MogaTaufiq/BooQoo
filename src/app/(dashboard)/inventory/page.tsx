@@ -82,17 +82,17 @@ export default function InventoryPage() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <Card className="p-4">
           <h3 className="text-sm font-medium text-gray-600 mb-2">Total Produk</h3>
-          <p className="text-3xl font-bold text-gray-900">{inventory.length}</p>
+          <p className="text-2xl md:text-3xl font-bold text-gray-900">{inventory.length}</p>
         </Card>
 
         <Card className="p-4">
           <h3 className="text-sm font-medium text-gray-600 mb-2">Stok Menipis</h3>
-          <p className="text-3xl font-bold text-yellow-600">{lowStockCount}</p>
+          <p className="text-2xl md:text-3xl font-bold text-yellow-600">{lowStockCount}</p>
         </Card>
 
         <Card className="p-4">
           <h3 className="text-sm font-medium text-gray-600 mb-2">Hampir Kedaluwarsa</h3>
-          <p className="text-3xl font-bold text-red-600">{expiringCount}</p>
+          <p className="text-2xl md:text-3xl font-bold text-red-600">{expiringCount}</p>
         </Card>
       </div>
 

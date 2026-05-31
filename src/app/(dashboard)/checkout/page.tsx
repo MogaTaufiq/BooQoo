@@ -165,7 +165,7 @@ export default function CheckoutPage() {
   );
 
   return (
-    <div className="h-screen flex flex-col">
+    <div className="flex flex-col h-full min-h-[calc(100vh-8rem)]">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-2xl font-bold text-gray-900">Kasir / POS</h2>
         <Button variant="outline" onClick={() => router.push('/transactions')}>

@@ -41,9 +41,10 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     };
 
     const sizes = {
+      xs: 'h-7 px-2 text-xs',
       sm: 'h-9 px-3 text-sm',
-      md: 'h-11 px-4 text-base',
-      lg: 'h-12 px-6 text-lg',
+      md: 'h-10 px-4 text-sm sm:text-base',
+      lg: 'h-12 px-6 text-base sm:text-lg',
     };
 
     const widthClass = fullWidth ? 'w-full' : '';
